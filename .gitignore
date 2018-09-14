@@ -1,0 +1,9 @@
+# pipenv stuff
+.venv/
+.env
+
+*.pyc
+
+Pipfile
+Pipfile.lock
+pylava.ini
