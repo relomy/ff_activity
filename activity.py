@@ -1,5 +1,4 @@
 import pprint
-
 from player_info import Player_Info
 
 
@@ -13,27 +12,6 @@ class Activity(object):
         self.recent_activity = []
 
         # individual activity fields
-        self.actingAsTeamOwner = None
-        self.activityType = None
-        self.batchProcessed = None
-        self.bidAmount = None
-        self.byLM = None
-        self.date = None
-        self.dateAccepted = None
-        self.dateModified = None
-        self.dateProposed = None
-        self.dateToProcess = None
-        self.parentPendingMoveBatchId = None
-        self.pendingMoveBatchId = None
-        self.pendingMoveItems = None
-
-        # fetch activity for league_id/year/cookies
-        self._fetch_activity(data)
-
-    def _fetch_activity(self, data):
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint(data)
-
         self.events = []
         self.actingAsTeamOwner = data['actingAsTeamOwner']
         self.activityType = int(data['activityType'])
@@ -48,10 +26,6 @@ class Activity(object):
         self.parentPendingMoveBatchId = data['parentPendingMoveBatchId']
         self.pendingMoveBatchId = data['pendingMoveBatchId']
         self.pendingMoveItems = data['pendingMoveItems']
-
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint()
-        # pp.pprint(data)
 
         # if self.pendingMoveItems:
         #     self.pendingMoveItemsHuman = self.get_human(self.pendingMoveItems)
