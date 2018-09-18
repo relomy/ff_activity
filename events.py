@@ -35,8 +35,8 @@ class Events:
         if status != 200:
             raise Exception('[script.py] Requests status != 200. It is: {0}'.format(status))
 
-        # get five most recent items
-        fetched_activity = data['items'][0:4]
+        # get twenty most recent items
+        fetched_activity = data['items'][0:20]
 
         for single in fetched_activity:
             a = Activity(single)

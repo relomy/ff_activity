@@ -117,7 +117,7 @@ class Activity(object):
             l.append("Player: {}".format(x['playerId']))
             playa = Player_Info(x['playerId'])
             print(playa)
-            l.append("moveType: {}".format(move_type_map.get(x['moveTypeId'], 'unknown ???')))
+            l.append("moveType: {}".format(move_type_map.get(x['moveTypeId'], 'unknown move_type ???')))
             l.append("from team [{}] to team [{}]".format(
                 team_map[x['fromTeamId']],
                 team_map[x['toTeamId']]))

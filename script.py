@@ -9,7 +9,6 @@ from events import Events
 
 
 def main():
-
     # pull espn_s1 and swid cookies from .env file (or in the environment somehow)
     espn_s2 = os.environ['espn_s2']
     swid = os.environ['swid']
@@ -43,7 +42,6 @@ def main():
     # check transaction in each league
     for league_id in league_ids:
         text_msg = []
-        print("League {0}".format(league_map.get(league_id, '???')))
 
         # create Events object (holds Activity) object and return recent activity
         recent_activity = Events(league_id, year, cookies).recent_activity
@@ -54,14 +52,11 @@ def main():
             activity_date = parser.parse(a.date)
             # make date naive
             activity_date = activity_date.replace(tzinfo=None)
-            print("Difference between {} [now] and {} is {}".format(
-                current_dt,
-                activity_date,
-                current_dt - activity_date
-            ))
             # if date of transaction is less than timedelta threshold, send message
             if activity_date >= current_dt - timedelta(minutes=threshold):
-                print("It is >=")
+                print("Activity date [{0}] is >= current date [{1}] - threshold [{2} minutes]".format(
+                    activity_date, current_dt, threshold
+                ))
                 # check if text_msg is empty
                 if len(text_msg) == 0:
                     text_msg.append("League {0}".format(league_map.get(league_id, '???')))
@@ -69,11 +64,10 @@ def main():
                 # append str representation to text_msg
                 text_msg.append(str(a))
 
-                print("Appending text_msg:")
+                print("Appending text_msg:\n")
                 print(a)
-            else:
-                print("Nope. It is <")
-                print(a)
+            #else:
+            #    print(a)
 
         # send email
         # TODO only create SMTP connect if message to send
@@ -86,9 +80,6 @@ def main():
             # print('\n'.join(text_msg))
             server.sendmail(email, phone, '\n'.join(text_msg))
             server.quit()
-
-        else:
-            print("No transactions within threshold")
 
 
 if __name__ == "__main__":
