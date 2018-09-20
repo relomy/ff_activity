@@ -33,6 +33,43 @@ class Player_Info:
         self.universeId = None
         self.value = None
 
+        # proTeamId map
+        self.pro_team_map = {
+            0: 'FA',
+            1: 'ATL',
+            2: 'BUF',
+            3: 'CHI',
+            4: 'CIN',
+            5: 'CLE',
+            6: 'DAL',
+            7: 'DEN',
+            8: 'DET',
+            9: 'GB',
+            10: 'TEN',
+            11: 'IND',
+            12: 'KC',
+            13: 'OAK',
+            14: 'LAR',
+            15: 'MIA',
+            16: 'MIN',
+            17: 'NE',
+            18: 'NO',
+            19: 'NYG',
+            20: 'NYJ',
+            21: 'PHI',
+            22: 'ARI',
+            23: 'PIT',
+            24: 'LAC',
+            25: 'SF',
+            26: 'SEA',
+            27: 'TB',
+            28: 'WSH',
+            29: 'CAR',
+            30: 'JAX',
+            33: 'BAL',
+            34: 'HOU'
+        }
+
         self._fetch_player()
 
     def _fetch_player(self):
@@ -51,7 +88,6 @@ class Player_Info:
         self.status = r.status_code
         data = r.json()
 
-        # TODO: add authentication
         if self.status != 200:
             raise Exception('Requests status != 200. It is: {0}'.format(self.status))
 
@@ -86,7 +122,10 @@ class Player_Info:
         self.universeId = playa['universeId']
         self.value = playa['value']
 
-        pro_games = data['playerInfo']['progames']
+        # use pro_team_map to map proTeamId
+        self.proTeam = self.pro_team_map.get(self.proTeamId, '???')
+
+        self.pro_games = data['playerInfo']['progames']
         # for k, v in pro_games.items():
         #     print(v)
         # print(pro_games)
@@ -123,7 +162,7 @@ class Player_Info:
         return 'Player_Info({} {}, {})'.format(self.first_name, self.last_name, self.player_id)
 
     def __str__(self):
-        return '{} {}'.format(self.first_name, self.last_name)
+        return '{} {}, {}'.format(self.first_name, self.last_name, self.proTeam)
 
     def attr_list(self, should_print=False):
         """Return (or print) the attributes associated with this classself."""
