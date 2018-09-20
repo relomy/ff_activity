@@ -1,15 +1,17 @@
 import requests
-import pprint
 
 from activity import Activity
 
+
 class Events:
     """Creates Events object."""
-    def __init__(self, leagueId, year, cookies=None):
+
+    def __init__(self, leagueId, year, team_map, cookies=None):
         # arguments
         self.ENDPOINT = "http://games.espn.com/ffl/api/v2/"
         self.league_id = leagueId
         self.year = year
+        self.team_map = team_map
         self.cookies = cookies
 
         # store Activity objects in here
@@ -19,8 +21,6 @@ class Events:
         self._fetch_activity()
 
     def _fetch_activity(self):
-        pp = pprint.PrettyPrinter(indent=4)
-
         params = {
             'leagueId': self.league_id,
             'seasonId': self.year
@@ -35,9 +35,9 @@ class Events:
         if status != 200:
             raise Exception('[script.py] Requests status != 200. It is: {0}'.format(status))
 
-        # get twenty most recent items
-        fetched_activity = data['items'][0:20]
+        # get all items
+        fetched_activity = data['items']
 
         for single in fetched_activity:
-            a = Activity(single)
+            a = Activity(single, self.team_map)
             self.recent_activity.append(a)
