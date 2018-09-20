@@ -3,12 +3,54 @@ import os
 import smtplib
 from datetime import datetime, timedelta
 from dateutil import parser
+import requests
 
-# import events object which holds Acitivyt objects
+# import events object which holds Activity objects
 from events import Events
 
 
+def fetch_team_map(league_id, year, cookies):
+    """Fetch team abbrev + names from leagueSettings."""
+    # fetch teams from ENDPOINT+leagueSettings
+    ENDPOINT = "http://games.espn.com/ffl/api/v2/"
+
+    # set parameters
+    params = {
+        'leagueId': league_id,
+        'seasonId': year
+    }
+
+    # send GET request
+    r = requests.get('{0}leagueSettings'.format(ENDPOINT), params=params, cookies=cookies)
+    status = r.status_code
+
+    # if not successful, raise an exception
+    if status != 200:
+        raise Exception('[script.py] Requests status != 200. It is: {0}'.format(status))
+
+    # store response
+    data = r.json()
+    teams = data['leaguesettings']['teams']
+
+    # iterate through each team and fill the team_map
+    team_map = {}
+    for team in teams:
+        team_id = int(team)
+        team_abbrev = teams[team]['teamAbbrev']
+        team_owner = "{0} {1}".format(teams[team]['owners'][0].get('firstName', ''),
+                                      teams[team]['owners'][0].get('lastName', ''))
+        # print("team_id: {} team_abbrev: {} team_owner: {}".format(team_id, team_abbrev, team_owner))
+        team_map[team_id] = "{} [{}]".format(team_abbrev.upper(), team_owner.title())
+
+    # be sure to include the FA/waivers team
+    team_map[-1] = 'FA/Waivers/Null'
+
+    # print(team_map)
+    return team_map
+
+
 def main():
+    """Check each league for recent activity and send a text message."""
     # pull espn_s1 and swid cookies from .env file (or in the environment somehow)
     espn_s2 = os.environ['espn_s2']
     swid = os.environ['swid']
@@ -43,8 +85,11 @@ def main():
     for league_id in league_ids:
         text_msg = []
 
+        # fetch teams in leagueId
+        team_map = fetch_team_map(league_id, year, cookies)
+
         # create Events object (holds Activity) object and return recent activity
-        recent_activity = Events(league_id, year, cookies).recent_activity
+        recent_activity = Events(league_id, year, team_map, cookies).recent_activity
 
         # iterate through each activity event
         for a in recent_activity:
@@ -58,7 +103,7 @@ def main():
                     activity_date, current_dt, threshold
                 ))
                 # check if text_msg is empty
-                if len(text_msg) == 0:
+                if not text_msg:
                     text_msg.append("League {0}".format(league_map.get(league_id, '???')))
 
                 # append str representation to text_msg
@@ -66,8 +111,9 @@ def main():
 
                 print("Appending text_msg:\n")
                 print(a)
-            #else:
-            #    print(a)
+            # else:
+            #     print(a)
+            #     break
 
         # send email
         # TODO only create SMTP connect if message to send
