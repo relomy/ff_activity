@@ -38,16 +38,10 @@ def main():
         league = League(league_id=league_id, year=year, espn_s2=espn_s2, swid=swid)
         recent_activity = league.recent_activity()
 
-        # fetch teams in leagueId
-        # team_map = fetch_team_map(league_id, year, cookies)
-
-        # create Events object (holds Activity) object and return recent activity
-        # recent_activity = Events(league_id, year, team_map, cookies).recent_activity
-
         # iterate through each activity event
         for activity in recent_activity:
             # convert activity date (iso format) to datetime
-            activity_date = datetime.fromtimestamp(activity.date / 1000)
+            activity_date = datetime.utcfromtimestamp(activity.date / 1000)
             # make date naive
             activity_date = activity_date.replace(tzinfo=None)
 
@@ -74,7 +68,7 @@ def main():
                 text_msg.append(msg)
 
                 print("Appending text_msg:\n")
-                print(activity)
+                print(text_msg)
 
         # send email
         if text_msg:
@@ -90,3 +84,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
